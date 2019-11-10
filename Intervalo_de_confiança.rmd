@@ -1,0 +1,50 @@
+---
+title: "Inferêcia com uso de Intervalo de Confiança"
+subtitle: "trying"
+author: "Fabiana Alves"
+date: "11/10/2019"
+output: 
+  pdf_document:
+    toc: true
+    toc_depth: 2
+---
+
+Modelo relatório = https://pt.scribd.com/doc/40009749/Modelo-de-Relatorio-Academico 
+### Universidade Federal de Campina Grande | UFCG 
+### Ciência da Computação 
+### Ciência de Dados Descritiva 
+### **Professor**: Nazareno Andrade 
+### **Aluno(a)**: Fabiana Alves
+
+
+\newpage
+
+# Introdução 
+
+Este relatório se propõe a fazer inferências estátisticas dentro de um intervalo de confiança para um conjunto de dados sobre avaliações de usuários a filmes que já assistiram. 
+
+Os dados são fornecidos pelo ***[GroupLens](https://grouplens.org/about/what-is-grouplens/)***, 
+que é um laboratório de pesquisa no **Departamento de Ciência da Computação e Engenharia** na ***[University of Minnesota, Twin Cities](https://twin-cities.umn.edu/)***.
+
+Os dados fornecidos[¹](https://grouplens.org/datasets/movielens/), podem ser atualizados sem aviso prévio. Portanto, os dados utilizados para a elaboração deste relatório ficarão disponíveis em um endereço específico[²](#data), junto aos artefatos necessários para criação desse relatório.
+
+
+
+### Referências: 
+  - ¹ - https://grouplens.org/datasets/movielens/ 
+  - ² - <github_link>
+
+
+\newpage
+
+## Desenvolvimento
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r cars}
+summary(cars)
+```
