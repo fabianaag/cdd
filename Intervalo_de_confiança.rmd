@@ -8,8 +8,6 @@ output:
     df_print: kable
 ---
 
-Modelo relatório = https://pt.scribd.com/doc/40009749/Modelo-de-Relatorio-Academico 
-
 ### Universidade Federal de Campina Grande | UFCG 
 ### Ciência da Computação 
 ### Ciência de Dados Descritiva 
@@ -106,8 +104,6 @@ Agora que filtramos os tipos de filmes que temos interesse, devemos filtrar as a
                     bind_rows(ratings_comedy) %>% 
                     bind_rows(ratings_romance)
 ```
-
-\newpage
 
 
 #### 1. Dentre os gêneros de Ação, Romance e Comédia; Algum deles recebe avaliação mais alta?
