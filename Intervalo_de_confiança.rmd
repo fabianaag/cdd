@@ -1,11 +1,13 @@
 ---
 title: "Inferêcia com uso de Intervalo de Confiança"
-subtitle: "trying"
 author: "Fabiana Alves"
 date: "11/10/2019"
 output:
   pdf_document:
     df_print: kable
+  html_document:
+    df_print: paged
+subtitle: trying
 ---
 
 ### Universidade Federal de Campina Grande | UFCG 
@@ -133,6 +135,8 @@ Vamos aplicar um intervalo de confiança de 95%, ou seja se pegassemos 100 amost
   ggsave('histogram.jpg') # :@@@@@@@@@@@@@@@@@
 ```
 
+![](./histogram.jpg)
+
 Como podemos observar, a os dados se distribuem de maneira normal fazendo com que se tornem bons dados para esse tipo de análise. 
 
 Ao gerar os intervalos de confiança temos: 
@@ -156,7 +160,7 @@ Ao gerar os intervalos de confiança temos:
   ggsave('cis_generos.jpg')
 ```
 
-
+![](./cis_generos.jpg)
 
 --- 
 
@@ -188,6 +192,8 @@ Gerando o intervalo de confiança temos:
     xlab("Título") + ylab("Intervalo de confiança para avaliação média")
   ggsave('cis_titulos.jpg')
 ```
+
+![](./cis_titulos.jpg)
 
 \newpage 
 
