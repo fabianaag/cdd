@@ -1,18 +1,20 @@
 ---
 title: "Inferência com uso de Intervalo de Confiança"
-subtitle: "movies :)"
-author: "Fabiana Alves"
-date: "11/10/2019"
+author: "Fabiana Alves Gomes"
+date: "11/11/2019"
 output:
+  html_document:
+    df_print: paged
   pdf_document:
     df_print: kable
+subtitle: movies :)
 ---
 
 ### Universidade Federal de Campina Grande | UFCG 
 ### Ciência da Computação 
 ### Ciência de Dados Descritiva 
 ### **Professor**: Nazareno Andrade 
-### **Aluno(a)**: Fabiana Alves
+### **Aluno(a)**: Fabiana Alves Gomes
 
 
 \newpage
@@ -130,7 +132,7 @@ Vamos aplicar um intervalo de confiança de 95%, ou seja se pegassemos 100 amost
     ggtitle("Histograma das avaliações por gênero do filme") + 
     ylab("Número de avaliações") + 
     xlab("Valor da avaliação")
-  ggsave('histogram.jpg') # :@@@@@@@@@@@@@@@@@
+  ggsave('histogram.jpg') 
 ```
 
 ![](./histogram.jpg)
@@ -209,3 +211,8 @@ Na nossa análise pode-se dizer que nossas respostas indicam que:
   - Sim, os espectadores deram em média avaliações mais altas para os filmes de Romance, Ação e Comédia respectivamente.
 2. ***Senhor dos Anéis* vs *Harry Potter*, algum dos dois é melhor avaliado?** 
   - Sim, para um intervalo de confiança de 95% a avaliação média dos filmes de **O Senhor dos Anéis** (3.98 ~ 4.13), costuma ser mais alta do que a avaliação média de **Harry Potter** (3.75 ~ 3.88)
+  
+  
+  
+---
+  
