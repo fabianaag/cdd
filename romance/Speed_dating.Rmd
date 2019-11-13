@@ -24,7 +24,7 @@ When you click the **Knit** button a document will be generated that includes bo
 library(readr)
 library(fmsb)
 library(tidyverse)
-speed_dating <- read_csv("/home/fabiana/speed-dating.csv")
+speed_dating <- read_csv('~/cdd/romance/speed-dating.csv')
 speed_dating_attributes <- select(speed_dating, attr, sinc, intel, fun, amb, shar)
 speed_dating_attributes <- speed_dating_attributes[complete.cases(speed_dating_attributes),]
 modeloLinear <- lm(like ~ attr + sinc + intel + fun + amb + shar, data = speed_dating)
