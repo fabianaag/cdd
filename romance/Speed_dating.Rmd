@@ -4,29 +4,140 @@ author: "Fabiana Alves Gomes"
 date: "12 de novembro de 2019"
 output: html_document
 ---
-### Universidade Federal de Campina Grande | UFCG 
-### Ciência da Computação 
-### Ciência de Dados Descritiva 
+### **Universidade Federal de Campina Grande | UFCG**
+### **Ciência da Computação **
+### **Ciência de Dados Descritiva**
 ### **Professor**: Nazareno Andrade 
 ### **Aluno(a)**: Fabiana Alves Gomes
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+\newpage
+
+
+```{r ,warning=FALSE,message=FALSE,echo=FALSE, warning=FALSE}
+library(readr, quietly = TRUE, warn.conflicts = FALSE)
+library(fmsb, quietly = TRUE, warn.conflicts = FALSE)
+library(tidyverse, quietly = TRUE, warn.conflicts = FALSE)
+library(ggplot2, warn.conflicts = FALSE, quietly = TRUE)
+library(dplyr, warn.conflicts = FALSE, quietly = TRUE)
+library(GGally, warn.conflicts = FALSE, quietly = TRUE)
+library(broom, warn.conflicts = FALSE, quietly = TRUE)
+
+speed_dating <- read_csv('./speed-dating.csv')
+
+# Seleciona atributos para análise
+speed_dating_attributes <- select(speed_dating, like, attr, sinc, intel, fun, amb, shar, prob, age, age_o, gender)
+# Limpa linhas que tem NA
+speed_dating_attributes <- speed_dating_attributes[complete.cases(speed_dating_attributes),]
+
+dataWomen = speed_dating_attributes %>% 
+            filter(gender == "0") %>% 
+            mutate(age_diff = age - age_o) %>% 
+            select(like, attr, sinc, intel, fun, amb, shar, prob, age_diff)  
+
+dataMen = speed_dating_attributes %>% 
+            filter(gender == "1") %>% 
+            mutate(age_diff = age - age_o) %>% 
+            select(like, attr, sinc, intel, fun, amb, shar, prob, age_diff)
+
 ```
 
-## R Markdown
+---
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## Introdução 
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Este relatório tem como objetivo fazer a análise de dados sobre encontro relâmpagos, tais encontros tem uma duração de em média 4 minutos e também é conhecido como ***speed dating***. Os dados¹ foram coletados pelos professores da Columbia Business School em um experimento² com esse fim, e após fazermos uma manipulação para excluir dados inválidos para análise, temos dados sobre **4024 encontros** que podemos analisar. 
+
+Essa análise irá tentar utilizar um subconjunto dos dados para criar um modelo que tente prever quais características fazem com que uma pessoa ***goste*** da outra. Ou seja, considerando 2 indivíduos *P1* e *P2*, criar um modelo que tente explicar o que faz *P1* gostar de *P2*, baseado em quanto *P1* achou *P2*: Atraente, Sincero, Inteligente e etc.
+
+¹ Dados - https://github.com/nazareno/ciencia-de-dados-1/tree/master/5-regressao/speed-dating
+² Experimento - https://faculty.chicagobooth.edu/emir.kamenica/documents/genderDifferences.pdf 
+
+## Desenvolvimento 
+
+Em modelos de regressão múltipla é necessário determinar um subconjunto de variáveis independentes que melhor explique a variável resposta, isto é, dentre todas as variáveis explicativas disponíveis, devemos encontrar um subconjunto de variáveis importantes para o modelo. 
+
+Construir um modelo que inclui apenas um subconjunto de variáveis explicativas envolve dois objetivos conflitantes: 
+
+  1. Obter o máximo de informação por meio de um modelo com tantas variáveis independentes possíveis.
+  
+  2. Diminuir a variância da estimativa e o custo da coleta por meio de um modelo com menor número possível de variáveis.
+
+Desta forma, obter um equilíbrio entre esses dois compromissos é de interesse. 
+
+A priori podemos tentar idenficar como essas variáveis se correlacionam: 
+
+```{r fig.width=12}
+ggpairs(dataMen, title = "Tabela de correlação das variáveis para os homens")
+ggpairs(dataWomen, title = "Tabela de correlação das variáveis para as mulheres")
+```
+
+É possível ao separar os dados, idenficar que algumas variáveis tem uma correlação mais forte com a variável *like*. Seguindo essa intuição, podemos então construir um modelo linear para homens e mulheres levando em consideração as variáveis que estão mais correlacionadas com "like". 
 
 ```{r}
-library(readr)
-library(fmsb)
-library(tidyverse)
-speed_dating <- read_csv('~/cdd/romance/speed-dating.csv')
-speed_dating_attributes <- select(speed_dating, attr, sinc, intel, fun, amb, shar)
-speed_dating_attributes <- speed_dating_attributes[complete.cases(speed_dating_attributes),]
+lm_men = lm(like ~ attr, dataMen)  
+lm_women = lm(like ~ fun, dataWomen)
+summary(lm_men)
+summary(lm_women)
+```
+
+Ao avaliar esses dois modelos iniciais podemos ver que o R² é de 0.4 para o modelo dos homens e 0.5 para as mulheres. Essa métrica varia de 0 a 1, caso seja 0 indicaria que o modelo não explica a variável dependente e quanto mais próximo de 1 melhor o modelo de regressão explica a variável dependente.  
+
+Nota, em modelos de regressão linear ao adicionar mais variáveis o R² poderá incrementar, por isso a medida de *Adjusted R²* é preferível, pois ela considera a quantidade de variáveis
+(https://feliperego.github.io/blog/2015/10/23/Interpreting-Model-Output-In-R) 
+
+
+Incrementando o modelo de regressão com as variáveis que tem correlação com *like* acima de 0.5 para cada um dos sexos temos: 
+
+```{r}
+lm_men = lm(like ~   attr + fun +  shar + prob , dataMen)  
+lm_women = lm(like ~ fun +  attr + shar + sinc + intel, dataWomen)
+summary(lm_men)
+summary(lm_women)
+```
+
+Ao fazer tal modificação podemos observar um aumento em R² para os 2 modelos. Por último, podemos adicionar a diferença de idade entre os participantes para observar se isso chega a influenciar o modelo. 
+
+```{r}
+lm_men = lm(like ~ attr + fun + shar + prob + age_diff , dataMen)  
+lm_women = lm(like ~ fun + attr + shar + sinc + age_diff, dataWomen)
+summary(lm_men)
+summary(lm_women)
+```
+Ou seja, segundo o modelo ao adicionar a variável de diferença de idade entre os participantes não podemos ver nenhuma melhora significativa em relação a R², e no caso das mulheres uma leve queda na capacidade do modelo de explicar a variável resposta *like* dadas as variáveis independentes. 
+
+## Conclusões 
+
+
+Neste relatório utilizamos de modelos lineares para tentar explicar características que possam  influenciar um indivíduo gostar de outro em um encontro relâmpago, ou speed dating. Partimos de modelos mais simples, para modelos mais complexos analisando o quão bem o modelo em questão explica a variável independente. 
+
+Neste processo identificamos que algumas variáveis como a diferença de idade entre os individuos, não parecem influenciar na qualidade do modelo ou até ter impactos negativos, introzindo ruído e diminuíndo a eficácia do modelo. 
+
+Um modelo de regressão ideal, explicaria toda a variância e teria portanto uma métrica próxima a 1. 
+Porém existem fatores aleatórios que não foram considerados pelo modelo que poderiam afetar a qualidade do mesmo, por exemplo, as cidades de origem dos indivíduos por consequência a distância entre os indivíduos, se são da mesma etnia, etc. 
+https://towardsdatascience.com/statistics-for-machine-learning-r-squared-explained-425ddfebf667 ~ (explicação R²)
+
+
+
+
+```{r}
+
+# https://data.library.virginia.edu/diagnostic-plots/ (Como interpretar a função abaixo)
+# https://data.princeton.edu/R/linearModels
+plot(lm_men)
+plot(lm_women)
+```
+
+
+
+
+
+
+
+
+
+
+
+```
 modeloLinear <- lm(like ~ attr + sinc + intel + fun + amb + shar, data = speed_dating)
 summary(modeloLinear)
 boxplot(speed_dating_attributes$attr, speed_dating_attributes$sinc, speed_dating_attributes$intel, speed_dating_attributes$fun, speed_dating_attributes$amb, speed_dating_attributes$shar)
@@ -47,7 +158,7 @@ radarchart(speed_dating_attributes, axistype=0 , maxmin=F)
 ```
 ```{r}
 speed_dating_women <- speed_dating[speed_dating$gender == 0,]
-modeloLinearMulheres <- lm(like ~ attr + sinc + intel + fun + amb + shar, data = speed_dating_women)
+modeloLinearMulheres <- lm(like ~ attr + sinc + intel + fun + shar, data = speed_dating_women)
 summary(modeloLinearMulheres)
 plot(modeloLinearMulheres)
 ```
