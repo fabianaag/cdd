@@ -1,6 +1,6 @@
 ---
 title: "speed-dating"
-author: "Fabiana Alves Gomes"
+
 date: "12 de novembro de 2019"
 output: html_document
 ---
@@ -105,7 +105,7 @@ summary(lm_women)
 ```
 Ou seja, segundo o modelo ao adicionar a variável de diferença de idade entre os participantes não podemos ver nenhuma melhora significativa em relação a R², e no caso das mulheres uma leve queda na capacidade do modelo de explicar a variável resposta *like* dadas as variáveis independentes. 
 
-## Conclusões 
+#### Conclusões 
 
 
 Neste relatório utilizamos de modelos lineares para tentar explicar características que possam  influenciar um indivíduo gostar de outro em um encontro relâmpago, ou speed dating. Partimos de modelos mais simples, para modelos mais complexos analisando o quão bem o modelo em questão explica a variável independente. 
@@ -118,22 +118,67 @@ https://towardsdatascience.com/statistics-for-machine-learning-r-squared-explain
 
 
 
-
-```{r}
+### Quanto a sinceridade e o interesse em comum influenciam o like? 
+```{r fig.width=12}
 
 # https://data.library.virginia.edu/diagnostic-plots/ (Como interpretar a função abaixo)
 # https://data.princeton.edu/R/linearModels
-plot(lm_men)
-plot(lm_women)
+#plot(lm_men)
+#plot(lm_women)
+
+
+lm_women <- speed_dating %>%
+  filter(gender == 0) %>%
+  select(like,shar,sinc)
+
+
+#Análise de correlação para Mulheres
+lm_women = lm_women %>% 
+  na.omit(lm_women)
+
+lm_women %>% 
+  ggpairs(title = "Tabela de correlação das variáveis para Mulheres")
+```
+
+
+```{r fig.width=12}
+
+lm_men <- speed_dating %>%
+  filter(gender == 1) %>%
+  select(like,shar,sinc)
+
+#Análise de correlação para Homens
+lm_men= lm_men %>% 
+  na.omit(lm_men)
+lm_men %>%
+  ggpairs(title = "Tabela de correlação das variáveis para Homens")
+
+
+```
+
+ Como podemos perceber não há uma correlação muito forte entre as variáveis.
+
+
+```{r}
+
+speed_dating_women <- speed_dating[speed_dating$gender == 0,]
+modeloLinearMulheres <- lm(like ~ sinc  + shar, data = speed_dating_women)
+summary(modeloLinearMulheres)
+
 ```
 
 
 
+```{r}
+speed_dating_men <- speed_dating[speed_dating$gender == 1,]
+modeloLinearHomens <- lm(like ~ sinc + shar, data = speed_dating_men)
+summary(modeloLinearHomens)
+
+```
 
 
-
-
-
+Utilizamos like como sendo a variável dependente e shar(interesses em comum) e sinc(sinceridade) as variáveis independentes. De acordo com a coluna estimate, que mostra o quanto cada uma das variáveis independentes influenciam o like, vemos que o interesse em comum (0.47 para mulheres e 0.42 para homens) tem peso maior na variável like, comparada com a sinceridade (0.34 para mulheres e 0.30 para homens). 
+O p-valor das duas variáveis é próximo de zero para os dois modelos, com isso, podemos dizer que elas representam bem os modelos e a relação com a variável like.
 
 
 
@@ -141,26 +186,19 @@ plot(lm_women)
 modeloLinear <- lm(like ~ attr + sinc + intel + fun + amb + shar, data = speed_dating)
 summary(modeloLinear)
 boxplot(speed_dating_attributes$attr, speed_dating_attributes$sinc, speed_dating_attributes$intel, speed_dating_attributes$fun, speed_dating_attributes$amb, speed_dating_attributes$shar)
-#boxplot(ozone, ozone_norm, temp, temp_norm,
-#main = "Multiple boxplots for comparision",
-#at = c(1,2,4,5),
-#names = c("ozone", "normal", "temp", "normal"),
-#las = 2,
-#col = c("orange","red"),
-#border = "brown",
-#horizontal = TRUE,
-#notch = TRUE
-#)
 speed_dating_attributes <- sapply(speed_dating_attributes,FUN=median)
 speed_dating_attributes
 #speed_dating_attributes <- rbind(rep(1,10), rep(0,10), speed_dating_attributes)
 radarchart(speed_dating_attributes, axistype=0 , maxmin=F)
 ```
+
+### Quais são as características mais importantes para um homem/mulher ser percebido bem em um speed date? 
 ```{r}
+
 speed_dating_women <- speed_dating[speed_dating$gender == 0,]
 modeloLinearMulheres <- lm(like ~ attr + sinc + intel + fun + shar, data = speed_dating_women)
 summary(modeloLinearMulheres)
-plot(modeloLinearMulheres)
+
 ```
 
 
@@ -168,6 +206,6 @@ plot(modeloLinearMulheres)
 speed_dating_men <- speed_dating[speed_dating$gender == 1,]
 modeloLinearHomens <- lm(like ~ attr + sinc + intel + fun + amb + shar, data = speed_dating_men)
 summary(modeloLinearHomens)
-plot(modeloLinearHomens)
+
 ```
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
