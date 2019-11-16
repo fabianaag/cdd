@@ -10,8 +10,11 @@ output: html_document
 ### **Professor**: Nazareno Andrade 
 ### **Aluno(a)**: Fabiana Alves Gomes
 
-\newpage
+<center>
+  ![](../dados/logo.png)
+</center>
 
+\newpage
 
 ```{r ,warning=FALSE,message=FALSE,echo=FALSE, warning=FALSE}
 library(readr, quietly = TRUE, warn.conflicts = FALSE)
@@ -29,6 +32,10 @@ speed_dating_attributes <- select(speed_dating, like, attr, sinc, intel, fun, am
 # Limpa linhas que tem NA
 speed_dating_attributes <- speed_dating_attributes[complete.cases(speed_dating_attributes),]
 
+dataAll = speed_dating_attributes %>%
+            mutate(gender=ifelse(gender=="0", "Mulher", "Homen" )) %>% 
+            mutate(age_diff = age - age_o) 
+
 dataWomen = speed_dating_attributes %>% 
             filter(gender == "0") %>% 
             mutate(age_diff = age - age_o) %>% 
@@ -40,172 +47,187 @@ dataMen = speed_dating_attributes %>%
             select(like, attr, sinc, intel, fun, amb, shar, prob, age_diff)
 
 ```
-
 ---
 
 ## Introdução 
 
-Este relatório tem como objetivo fazer a análise de dados sobre encontro relâmpagos, tais encontros tem uma duração de em média 4 minutos e também é conhecido como ***speed dating***. Os dados¹ foram coletados pelos professores da Columbia Business School em um experimento² com esse fim, e após fazermos uma manipulação para excluir dados inválidos para análise, temos dados sobre **4024 encontros** que podemos analisar. 
+Este relatório tem como objetivo elucidar uma pergunta utilizando os dados de encontros relâmpagos, também conhecido como speed dating, tais encontros tem uma duração de em média 4 minutos.  O quanto a sinceridade e o interesse em comum influenciam o like?
 
-Essa análise irá tentar utilizar um subconjunto dos dados para criar um modelo que tente prever quais características fazem com que uma pessoa ***goste*** da outra. Ou seja, considerando 2 indivíduos *P1* e *P2*, criar um modelo que tente explicar o que faz *P1* gostar de *P2*, baseado em quanto *P1* achou *P2*: Atraente, Sincero, Inteligente e etc.
+Após os breves encontros os participantes respondiam a um questionário dizendo o que acharam sobre a pessoa com quem tiveram o encontro, no total foram responsidos por volta de 5 mil questionários sobre os encontros.  Após o tratamento dos dados restaram um total de **4024** respostas do questionário referente aos encontros que podemos analisar. 
 
-¹ Dados - https://github.com/nazareno/ciencia-de-dados-1/tree/master/5-regressao/speed-dating
-² Experimento - https://faculty.chicagobooth.edu/emir.kamenica/documents/genderDifferences.pdf 
+Os dados¹ foram coletados em um experimento² pelos professores da ***Columbia Business School***, que disponibilizaram os dados para a comunidade. 
+
+- ¹ Dados - https://github.com/nazareno/ciencia-de-dados-1/tree/master/5-regressao/speed-dating
+- ² Experimento - https://faculty.chicagobooth.edu/emir.kamenica/documents/genderDifferences.pdf 
+
+---
 
 ## Desenvolvimento 
 
-Em modelos de regressão múltipla é necessário determinar um subconjunto de variáveis independentes que melhor explique a variável resposta, isto é, dentre todas as variáveis explicativas disponíveis, devemos encontrar um subconjunto de variáveis importantes para o modelo. 
+Utilizaremos de Modelos de Regressão linear para tentar obter informações que possam indicar como a *sinceridade* e os *interesses percebidos em comum* influênciam o quanto um participante do experimento gosta do outro. Para tentar responder essa pergunta podemos comparar modelos que utilizam *sinceridade e interesses compartilhados* com outros modelos e comparar métricas de qualidades desses modelos. 
 
-Construir um modelo que inclui apenas um subconjunto de variáveis explicativas envolve dois objetivos conflitantes: 
+Em modelos de regressão múltipla é necessário determinar um subconjunto de variáveis independentes que melhor expliquem a variável resposta, isto é, dentre todas as variáveis explicativas disponíveis, devemos encontrar um subconjunto de variáveis importantes para o modelo. 
 
-  1. Obter o máximo de informação por meio de um modelo com tantas variáveis independentes possíveis.
+Assim iremos criar um modelo mais abrangente, ou seja que utiliza mais variáveis para estimar o valor do like. Além de outras duas variações desse modelo, removendo 2 variáveis do modelo inicial sendo elas,  *Interesses compartilhados(shar)* e *Sinceridade(sinc)* para a primeira variação, assim como removendo as 2 variáveis com maior correlação com a variável like para a segunda variação do modelo. 
+
+Nas visualizações de distribuição e correlação abaixo ciano e magenta serão utilizados, os picos que apresentarem a cor ciano indicam mais votos de homem naquela faixa e picos com a cor magenta, indicam predominância de votos de mulheres naquela faixa. 
+
+```{r fig.width=12,message=FALSE,echo=FALSE, warning=FALSE}
+sortedDataAll = dataAll %>% arrange(gender) 
+
+p = ggpairs(
+  title = "Tabela de correlação das ambos os sexos", 
+  mapping = aes(color=gender, alpha=0.1), 
+  columns = c( "like", "shar", "sinc"),
+  data=dataAll
+) 
+
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+        scale_fill_manual(values=c("cyan","magenta")) +
+        scale_color_manual(values=c("cyan","magenta"))  
+  }
+}
+p
+```
+
+--- 
+
+Percebemos então uma correlação moderada entre as variáveis de *Interesses Compartilhados* e *Sinceridade* com a variável dependente, Like. 
+
+Se observarmos a correlação das outras variáveis com a variável like, temos:
+
+```{r fig.width=12,message=FALSE,echo=FALSE, warning=FALSE}
+  p = ggpairs(
+    title = "Tabela de correlação para ambos os sexos", 
+    mapping = aes(color=gender, alpha=0.1), 
+    columns = c( "like", "amb", "attr", "fun", "intel",  "prob", "age_diff"),
+    data=dataAll
+  ) 
+  for(i in 1:p$nrow) {
+    for(j in 1:p$ncol){
+      p[i,j] <- p[i,j] + 
+        scale_fill_manual(values=c("cyan","magenta")) +
+        scale_color_manual(values=c("cyan","magenta"))   
+    }
+  }
+  p
+```
+
+
+### Os Modelos de Regressão 
+
+No total construiremos 3 modelos. 
+
+1. Like sendo explicado pelo máximo de variáveis.
+  Possivelmente o melhor modelo que iremos construir pois engloba um maior número de variáveis que explicam a variável dependente. 
   
-  2. Diminuir a variância da estimativa e o custo da coleta por meio de um modelo com menor número possível de variáveis.
+2. Like sendo explicado por todas menos 'fun' e 'attr'.
+  Esse modelo será útil para utilizarmos como comparativo dos impactos causados ao ignorar duas variáveis que tem maior correlação com a variável dependente.. 
+  
+3. like sendo explicado por todas menos 'sinc' e 'shar'.
+  Esse modelo ignora as variáveis que gostaríamos de investigar, nos permitindo comparar esse modelo com os outros.
 
-Desta forma, obter um equilíbrio entre esses dois compromissos é de interesse. 
+#### Comparando modelos de regressão 
 
-A priori podemos tentar idenficar como essas variáveis se correlacionam: 
-
-```{r fig.width=12}
-ggpairs(dataMen, title = "Tabela de correlação das variáveis para os homens")
-ggpairs(dataWomen, title = "Tabela de correlação das variáveis para as mulheres")
+Para o modelo 1, que tem o máximo de variáveis possíveis temos: 
+``` {r} 
+modelo01_m = lm(like ~ attr + sinc + intel + fun + amb + shar +  prob + age_diff, dataMen)  
+modelo01_w = lm(like ~ attr + sinc + intel + fun + amb + shar +  prob + age_diff, dataWomen)
+summary(modelo01_m)
+summary(modelo01_w)
 ```
 
-É possível ao separar os dados, idenficar que algumas variáveis tem uma correlação mais forte com a variável *like*. Seguindo essa intuição, podemos então construir um modelo linear para homens e mulheres levando em consideração as variáveis que estão mais correlacionadas com "like". 
-
-```{r}
-lm_men = lm(like ~ attr, dataMen)  
-lm_women = lm(like ~ fun, dataWomen)
-summary(lm_men)
-summary(lm_women)
+Para o modelo 2, que não considera 'fun' e 'attr', temos: 
+``` {r} 
+modelo02_m = lm(like ~ sinc + intel + amb + shar +  prob + age_diff, dataMen)  
+modelo02_w = lm(like ~ sinc + intel + amb + shar +  prob + age_diff, dataWomen)
+summary(modelo02_m)
+summary(modelo02_w)
 ```
 
-Ao avaliar esses dois modelos iniciais podemos ver que o R² é de 0.4 para o modelo dos homens e 0.5 para as mulheres. Essa métrica varia de 0 a 1, caso seja 0 indicaria que o modelo não explica a variável dependente e quanto mais próximo de 1 melhor o modelo de regressão explica a variável dependente.  
-
-Nota, em modelos de regressão linear ao adicionar mais variáveis o R² poderá incrementar, por isso a medida de *Adjusted R²* é preferível, pois ela considera a quantidade de variáveis
-(https://feliperego.github.io/blog/2015/10/23/Interpreting-Model-Output-In-R) 
-
-
-Incrementando o modelo de regressão com as variáveis que tem correlação com *like* acima de 0.5 para cada um dos sexos temos: 
-
-```{r}
-lm_men = lm(like ~   attr + fun +  shar + prob , dataMen)  
-lm_women = lm(like ~ fun +  attr + shar + sinc + intel, dataWomen)
-summary(lm_men)
-summary(lm_women)
+Para o modelo 3, que não considera 'sinc' e 'shar' temos: 
+``` {r} 
+modelo03_m = lm(like ~ attr + intel + fun + amb +  prob + age_diff, dataMen)  
+modelo03_w = lm(like ~ attr + intel + fun + amb +  prob + age_diff, dataWomen)
+summary(modelo03_m)
+summary(modelo03_w)
 ```
 
-Ao fazer tal modificação podemos observar um aumento em R² para os 2 modelos. Por último, podemos adicionar a diferença de idade entre os participantes para observar se isso chega a influenciar o modelo. 
 
-```{r}
-lm_men = lm(like ~ attr + fun + shar + prob + age_diff , dataMen)  
-lm_women = lm(like ~ fun + attr + shar + sinc + age_diff, dataWomen)
-summary(lm_men)
-summary(lm_women)
-```
-Ou seja, segundo o modelo ao adicionar a variável de diferença de idade entre os participantes não podemos ver nenhuma melhora significativa em relação a R², e no caso das mulheres uma leve queda na capacidade do modelo de explicar a variável resposta *like* dadas as variáveis independentes. 
+### Comentando métricas dos modelos 
 
-#### Conclusões 
+---
+
+#### Significância:
+  
+  Nas métricas dos modelos análisados temos códigos de significância para indicar variáveis que podem estar relacionadas com a variável resposta que procuramos ou nãõ. No caso desse relatório, 
+    
+##### Modelo 1
+Para o modelo dos homens vemos que a diferença de idade entre as pessoas no encontro não parece ser significante para o modelo. 
+Já para as mulheres além da diferença de idade, a ambição que a mulher julgava compartilhar com a pessoa que ela se encontrou não parece ser relevante para o like.
+
+    
+##### Modelo 2 (sem fun e attr)
+Para o modelo dos homens vemos que a diferença de idade continua sem ser significante para o modelo porém a ambição (amb) percebida perde um pouco a significância.
+Já para as mulheres a ambição e diferença de idade são variáveis que não parecem estar ligadas ao "like".
+
+  
+##### Modelo 3 (sem sinc e shar)
+Para o modelo dos homens vemos que a diferença de idade ganha um pouco de significância, porém a ambição (amb) percebida tem Pr(>|t|) muito alta pra ser considerado significante.
+Já para as mulheres a ambição e diferença de idade continuam sem estar ligadas ao "like".
+
+    
+    
+    
+    
+### Relevância e Magnitude dos Coeficientes:     
+Neste caso os coeficientes estão variando de 0 a 1, dando uma característica de peso a uma certa característica. Ou seja, quanto maior o coeficiente relacionado a uma certa característica, maior a influência que aquele atributo terá naquele modelo. 
+
+##### Modelo 1
+  Os fatores mais importantes são 'attr'(aparência) e 'fun'(Quão divertida a outra pessoa parecia) e 'attr e shar'(interesses compartilhados), para homens e mulheres respectivamente.
+
+##### Modelo 2 
+  Os fatores mais importantes para esse modelo são 'shar e prob'(Probabilidade de querer se ver de novo) e 'shar e intel'(inteligência percebida) para homens e mulheres respectivamente.  
+  
+##### Modelo 2 
+  Os fatores mais importantes para esse modelo são 'attr e fun' e 'attr e fun'(Quão divertido o ouro é) para homens e mulheres respectivamente.
 
 
+
+### R Squared e R Squared Adjusted:
+
+R Squared indica uma medida de quão bem o modelo se ajusta aos dados. É uma medida que varia de 0 a 1, onde 0 representa um modelo que não se adequa aos dados e valores próximos a 1, indicam modelos que se ajustam bem aos dados.  
+  
+##### Modelo 1
+  Os valores de R² pra esse modelo são os mais altos de todos os modelos, geralmente um número mais de variáveis pode aumentar o R² de um modelo.
+
+##### Modelo 2 
+  O menor valor de R² de todos os modelos, o que indica que a percepção de quão atrativa e legal a outra pessoa é, é bastante importante para a variável que queremos estimar.
+  
+##### Modelo 2 
+  Ao remover 'sinc' e  'shar', também temos uma degradação do modelo porém temos um modelo que explica melhor a variável independente do que o modelo 2. 
+
+  
+### Resíduos
+  Nas métricas de qualidade acima *Residual Standard Error* é a medida de ajuste do modelo de regressão. Teóricamente, todo modelo de regressão linear tem um erro associado ***E***. Devido a presença desse erro não somos capazes de predizer perfeitamente a variável *like* apartir das outras variáveis, sendo assim o *Residual Standard Error* (erro padrão residual) é o uma média da diferença entre as estimativas versus os dados reais observados. Ou seja, ao estimar, é provável que exista uma diferença entre a estimativa e o valor do like real com a magnitude do erro residual padrão.
+  
+##### Modelo 1
+  O erro residual padrão é 1.05. Lembrando que segundo as métricas esse até agora é o nosso melhor modelo. 
+
+##### Modelo 2 
+  O erro residual padrão é 1.236 e 1.25. Com menos variáveis e um R² menor do que o modelo 1,  o erro residual padrão aumenta como era de se esperar.
+  
+##### Modelo 3
+  O erro residual padrão é 1.086 e 1.123. Como vimos além do R² desse modelo ser melhor, ou seja um pouco maior do que o R² do modelo 2, o erro residual padrão também é menor. 
+
+## Conclusões 
 Neste relatório utilizamos de modelos lineares para tentar explicar características que possam  influenciar um indivíduo gostar de outro em um encontro relâmpago, ou speed dating. Partimos de modelos mais simples, para modelos mais complexos analisando o quão bem o modelo em questão explica a variável independente. 
 
 Neste processo identificamos que algumas variáveis como a diferença de idade entre os individuos, não parecem influenciar na qualidade do modelo ou até ter impactos negativos, introzindo ruído e diminuíndo a eficácia do modelo. 
 
 Um modelo de regressão ideal, explicaria toda a variância e teria portanto uma métrica próxima a 1. 
-Porém existem fatores aleatórios que não foram considerados pelo modelo que poderiam afetar a qualidade do mesmo, por exemplo, as cidades de origem dos indivíduos por consequência a distância entre os indivíduos, se são da mesma etnia, etc. 
-https://towardsdatascience.com/statistics-for-machine-learning-r-squared-explained-425ddfebf667 ~ (explicação R²)
+Porém existem fatores aleatórios que não foram considerados pelo modelo que poderiam afetar a qualidade do mesmo, por exemplo, as cidades de origem dos indivíduos e por consequência a distância entre os indivíduos, se são da mesma etnia, etc. 
 
-
-
-### Quanto a sinceridade e o interesse em comum influenciam o like? 
-```{r fig.width=12}
-
-# https://data.library.virginia.edu/diagnostic-plots/ (Como interpretar a função abaixo)
-# https://data.princeton.edu/R/linearModels
-#plot(lm_men)
-#plot(lm_women)
-
-
-lm_women <- speed_dating %>%
-  filter(gender == 0) %>%
-  select(like,shar,sinc)
-
-
-#Análise de correlação para Mulheres
-lm_women = lm_women %>% 
-  na.omit(lm_women)
-
-lm_women %>% 
-  ggpairs(title = "Tabela de correlação das variáveis para Mulheres")
-```
-
-
-```{r fig.width=12}
-
-lm_men <- speed_dating %>%
-  filter(gender == 1) %>%
-  select(like,shar,sinc)
-
-#Análise de correlação para Homens
-lm_men= lm_men %>% 
-  na.omit(lm_men)
-lm_men %>%
-  ggpairs(title = "Tabela de correlação das variáveis para Homens")
-
-
-```
-
- Como podemos perceber não há uma correlação muito forte entre as variáveis.
-
-
-```{r}
-
-speed_dating_women <- speed_dating[speed_dating$gender == 0,]
-modeloLinearMulheres <- lm(like ~ sinc  + shar, data = speed_dating_women)
-summary(modeloLinearMulheres)
-
-```
-
-
-
-```{r}
-speed_dating_men <- speed_dating[speed_dating$gender == 1,]
-modeloLinearHomens <- lm(like ~ sinc + shar, data = speed_dating_men)
-summary(modeloLinearHomens)
-
-```
-
-
-Utilizamos like como sendo a variável dependente e shar(interesses em comum) e sinc(sinceridade) as variáveis independentes. De acordo com a coluna estimate, que mostra o quanto cada uma das variáveis independentes influenciam o like, vemos que o interesse em comum (0.47 para mulheres e 0.42 para homens) tem peso maior na variável like, comparada com a sinceridade (0.34 para mulheres e 0.30 para homens). 
-O p-valor das duas variáveis é próximo de zero para os dois modelos, com isso, podemos dizer que elas representam bem os modelos e a relação com a variável like.
-
-
-
-```
-modeloLinear <- lm(like ~ attr + sinc + intel + fun + amb + shar, data = speed_dating)
-summary(modeloLinear)
-boxplot(speed_dating_attributes$attr, speed_dating_attributes$sinc, speed_dating_attributes$intel, speed_dating_attributes$fun, speed_dating_attributes$amb, speed_dating_attributes$shar)
-speed_dating_attributes <- sapply(speed_dating_attributes,FUN=median)
-speed_dating_attributes
-#speed_dating_attributes <- rbind(rep(1,10), rep(0,10), speed_dating_attributes)
-radarchart(speed_dating_attributes, axistype=0 , maxmin=F)
-```
-
-### Quais são as características mais importantes para um homem/mulher ser percebido bem em um speed date? 
-```{r}
-
-speed_dating_women <- speed_dating[speed_dating$gender == 0,]
-modeloLinearMulheres <- lm(like ~ attr + sinc + intel + fun + shar, data = speed_dating_women)
-summary(modeloLinearMulheres)
-
-```
-
-
-```{r}
-speed_dating_men <- speed_dating[speed_dating$gender == 1,]
-modeloLinearHomens <- lm(like ~ attr + sinc + intel + fun + amb + shar, data = speed_dating_men)
-summary(modeloLinearHomens)
-
-```
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+De tal forma que parece improvável que um modelo de regressão linear seja capaz de acertar com perfeição o like baseado nas respostas dos questionários após os encontros de 4 minutos. 
