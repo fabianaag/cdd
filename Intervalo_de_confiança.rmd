@@ -1,13 +1,14 @@
 ---
 title: "Inferência com uso de Intervalo de Confiança"
-author: "Fabiana Alves Gomes"
 date: "11/11/2019"
+
+
 output:
   html_document:
     df_print: paged
   pdf_document:
     df_print: kable
-subtitle: movies :)
+
 ---
 
 ### Universidade Federal de Campina Grande | UFCG 

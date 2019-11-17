@@ -1,8 +1,9 @@
 ---
 title: "speed-dating"
-
+output:
+  html_document: default
+  pdf_document: default
 date: "12 de novembro de 2019"
-output: html_document
 ---
 ### **Universidade Federal de Campina Grande | UFCG**
 ### **Ciência da Computação **
@@ -33,7 +34,7 @@ speed_dating_attributes <- select(speed_dating, like, attr, sinc, intel, fun, am
 speed_dating_attributes <- speed_dating_attributes[complete.cases(speed_dating_attributes),]
 
 dataAll = speed_dating_attributes %>%
-            mutate(gender=ifelse(gender=="0", "Mulher", "Homen" )) %>% 
+            mutate(gender=ifelse(gender=="0", "Mulher", "Homem" )) %>% 
             mutate(age_diff = age - age_o) 
 
 dataWomen = speed_dating_attributes %>% 
@@ -68,7 +69,7 @@ Utilizaremos de Modelos de Regressão linear para tentar obter informações que
 
 Em modelos de regressão múltipla é necessário determinar um subconjunto de variáveis independentes que melhor expliquem a variável resposta, isto é, dentre todas as variáveis explicativas disponíveis, devemos encontrar um subconjunto de variáveis importantes para o modelo. 
 
-Assim iremos criar um modelo mais abrangente, ou seja que utiliza mais variáveis para estimar o valor do like. Além de outras duas variações desse modelo, removendo 2 variáveis do modelo inicial sendo elas,  *Interesses compartilhados(shar)* e *Sinceridade(sinc)* para a primeira variação, assim como removendo as 2 variáveis com maior correlação com a variável like para a segunda variação do modelo. 
+Iremos criar um modelo mais abrangente, ou seja, que utiliza mais variáveis para estimar o valor do like. Além de outras duas variações desse modelo, removendo 2 variáveis do modelo inicial sendo elas,  *Interesses compartilhados(shar)* e *Sinceridade(sinc)* para a primeira variação, assim como removendo as 2 variáveis com maior correlação com a variável like para a segunda variação do modelo. 
 
 Nas visualizações de distribuição e correlação abaixo ciano e magenta serão utilizados, os picos que apresentarem a cor ciano indicam mais votos de homem naquela faixa e picos com a cor magenta, indicam predominância de votos de mulheres naquela faixa. 
 
@@ -162,7 +163,7 @@ summary(modelo03_w)
 
 #### Significância:
   
-  Nas métricas dos modelos análisados temos códigos de significância para indicar variáveis que podem estar relacionadas com a variável resposta que procuramos ou nãõ. No caso desse relatório, 
+  Nas métricas dos modelos análisados temos códigos de significância para indicar variáveis que podem estar relacionadas com a variável resposta que procuramos ou não.
     
 ##### Modelo 1
 Para o modelo dos homens vemos que a diferença de idade entre as pessoas no encontro não parece ser significante para o modelo. 
@@ -191,7 +192,7 @@ Neste caso os coeficientes estão variando de 0 a 1, dando uma característica d
 ##### Modelo 2 
   Os fatores mais importantes para esse modelo são 'shar e prob'(Probabilidade de querer se ver de novo) e 'shar e intel'(inteligência percebida) para homens e mulheres respectivamente.  
   
-##### Modelo 2 
+##### Modelo 3
   Os fatores mais importantes para esse modelo são 'attr e fun' e 'attr e fun'(Quão divertido o ouro é) para homens e mulheres respectivamente.
 
 
@@ -206,7 +207,7 @@ R Squared indica uma medida de quão bem o modelo se ajusta aos dados. É uma me
 ##### Modelo 2 
   O menor valor de R² de todos os modelos, o que indica que a percepção de quão atrativa e legal a outra pessoa é, é bastante importante para a variável que queremos estimar.
   
-##### Modelo 2 
+##### Modelo 3 
   Ao remover 'sinc' e  'shar', também temos uma degradação do modelo porém temos um modelo que explica melhor a variável independente do que o modelo 2. 
 
   
@@ -227,7 +228,12 @@ Neste relatório utilizamos de modelos lineares para tentar explicar caracterís
 
 Neste processo identificamos que algumas variáveis como a diferença de idade entre os individuos, não parecem influenciar na qualidade do modelo ou até ter impactos negativos, introzindo ruído e diminuíndo a eficácia do modelo. 
 
+Além disso, verificamos que as duas variáveis independentes influênciam mais no modelo para mulheres, ou seja, as mulheres se importam mais com o interesse em comum e a sinceridade do que os homens, de acordo com esse experimento. Por fim, percebemos também que a variável que representa o interesse em comum tem mais influência que a sinceridade.
+
 Um modelo de regressão ideal, explicaria toda a variância e teria portanto uma métrica próxima a 1. 
 Porém existem fatores aleatórios que não foram considerados pelo modelo que poderiam afetar a qualidade do mesmo, por exemplo, as cidades de origem dos indivíduos e por consequência a distância entre os indivíduos, se são da mesma etnia, etc. 
 
 De tal forma que parece improvável que um modelo de regressão linear seja capaz de acertar com perfeição o like baseado nas respostas dos questionários após os encontros de 4 minutos. 
+
+
+---
