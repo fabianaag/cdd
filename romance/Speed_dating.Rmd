@@ -1,7 +1,9 @@
 ---
 title: "speed-dating"
 output:
-  html_document: default
+  html_document:
+    df_print: paged
+  html_notebook: default
   pdf_document: default
 date: "12 de novembro de 2019"
 ---
