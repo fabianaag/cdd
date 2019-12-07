@@ -36,27 +36,29 @@ speed_dating_attributes <- select(speed_dating, like, attr, sinc, intel, fun, am
 speed_dating_attributes <- speed_dating_attributes[complete.cases(speed_dating_attributes),]
 
 dataAll = speed_dating_attributes %>%
-            mutate(gender=ifelse(gender=="0", "Mulher", "Homem" )) %>% 
-            mutate(age_diff = age - age_o) 
+            mutate(gender=ifelse(gender=="0", "Mulher", "Homem" ))
 
 dataWomen = speed_dating_attributes %>% 
             filter(gender == "0") %>% 
-            mutate(age_diff = age - age_o) %>% 
-            select(like, attr, sinc, intel, fun, amb, shar, prob, age_diff)  
+            select(like, attr, sinc, intel, fun, amb, shar, prob)  
 
 dataMen = speed_dating_attributes %>% 
             filter(gender == "1") %>% 
-            mutate(age_diff = age - age_o) %>% 
-            select(like, attr, sinc, intel, fun, amb, shar, prob, age_diff)
+            select(like, attr, sinc, intel, fun, amb, shar, prob)
 
 ```
 ---
 
 ## Introdução 
 
-Este relatório tem como objetivo elucidar uma pergunta utilizando os dados de encontros relâmpagos, também conhecido como speed dating, tais encontros tem uma duração de em média 4 minutos.  O quanto a sinceridade e o interesse em comum influenciam o like?
+Este relatório tem como objetivo elucidar uma pergunta utilizando os dados de encontros relâmpagos, também conhecido como speed dating.  
 
-Após os breves encontros os participantes respondiam a um questionário dizendo o que acharam sobre a pessoa com quem tiveram o encontro, no total foram responsidos por volta de 5 mil questionários sobre os encontros.  Após o tratamento dos dados restaram um total de **4024** respostas do questionário referente aos encontros que podemos analisar. 
+Logo, a pergunta que tentaremos elucidar é:
+- O quanto a sinceridade observada no parceiro e os interesses em comum influenciam o like?
+
+Após encontros que duravam 4 minutos os participantes respondiam a um questionário dizendo o que acharam sobre a pessoa com quem tiveram o encontro, no total foram respondidos por volta de 5 mil questionários sobre os encontros.  
+
+Após o tratamento dos dados restaram um total de **4024** respostas do questionário referente aos encontros que podemos analisar. 
 
 Os dados¹ foram coletados em um experimento² pelos professores da ***Columbia Business School***, que disponibilizaram os dados para a comunidade. 
 
@@ -71,9 +73,15 @@ Utilizaremos de Modelos de Regressão linear para tentar obter informações que
 
 Em modelos de regressão múltipla é necessário determinar um subconjunto de variáveis independentes que melhor expliquem a variável resposta, isto é, dentre todas as variáveis explicativas disponíveis, devemos encontrar um subconjunto de variáveis importantes para o modelo. 
 
-Iremos criar um modelo mais abrangente, ou seja, que utiliza mais variáveis para estimar o valor do like. Além de outras duas variações desse modelo, removendo 2 variáveis do modelo inicial sendo elas,  *Interesses compartilhados(shar)* e *Sinceridade(sinc)* para a primeira variação, assim como removendo as 2 variáveis com maior correlação com a variável like para a segunda variação do modelo. 
+No total iremos criar os seguintes modelos: 
+  - Um mais abrangente, contendo várias variáveis independentes. 
+  - Uma variação do modelo abrangente removendo *Interesses compartilhados(shar)* e *Sinceridade(sinc)*.
+  - Uma variação do modelo abrangente removendo 2 variáveis com maior correlação com a variável dependente.
 
-Nas visualizações de distribuição e correlação abaixo ciano e magenta serão utilizados, os picos que apresentarem a cor ciano indicam mais votos de homem naquela faixa e picos com a cor magenta, indicam predominância de votos de mulheres naquela faixa. 
+Para visualizar a distribuição e correlação, utilizamos as cores ciano e magenta sobrepostas, os picos que apresentarem a cor ciano indicam mais votos de homens naquela faixa, e picos com a cor magenta indicam predominância de votos de mulheres naquela faixa. 
+
+
+Para as variáveis que temos interesse: 
 
 ```{r fig.width=12,message=FALSE,echo=FALSE, warning=FALSE}
 sortedDataAll = dataAll %>% arrange(gender) 
@@ -105,7 +113,7 @@ Se observarmos a correlação das outras variáveis com a variável like, temos:
   p = ggpairs(
     title = "Tabela de correlação para ambos os sexos", 
     mapping = aes(color=gender, alpha=0.1), 
-    columns = c( "like", "amb", "attr", "fun", "intel",  "prob", "age_diff"),
+    columns = c( "like", "amb", "attr", "fun", "intel",  "prob"),
     data=dataAll
   ) 
   for(i in 1:p$nrow) {
@@ -121,39 +129,37 @@ Se observarmos a correlação das outras variáveis com a variável like, temos:
 
 ### Os Modelos de Regressão 
 
-No total construiremos 3 modelos. 
-
 1. Like sendo explicado pelo máximo de variáveis.
-  Possivelmente o melhor modelo que iremos construir pois engloba um maior número de variáveis que explicam a variável dependente. 
+  Possivelmente o melhor modelo que iremos construir, pois engloba um maior número de variáveis que explicam a variável dependente. 
   
 2. Like sendo explicado por todas menos 'fun' e 'attr'.
-  Esse modelo será útil para utilizarmos como comparativo dos impactos causados ao ignorar duas variáveis que tem maior correlação com a variável dependente.. 
+  Esse modelo será útil para utilizarmos como comparativo dos impactos causados ao ignorar duas variáveis que tem maior correlação com a variável dependente.
   
 3. like sendo explicado por todas menos 'sinc' e 'shar'.
   Esse modelo ignora as variáveis que gostaríamos de investigar, nos permitindo comparar esse modelo com os outros.
 
-#### Comparando modelos de regressão 
+#### Definindo os modelos de regressão
 
 Para o modelo 1, que tem o máximo de variáveis possíveis temos: 
 ``` {r} 
-modelo01_m = lm(like ~ attr + sinc + intel + fun + amb + shar +  prob + age_diff, dataMen)  
-modelo01_w = lm(like ~ attr + sinc + intel + fun + amb + shar +  prob + age_diff, dataWomen)
+modelo01_m = lm(like ~ attr + sinc + intel + fun + amb + shar +  prob, dataMen)  
+modelo01_w = lm(like ~ attr + sinc + intel + fun + amb + shar +  prob, dataWomen)
 summary(modelo01_m)
 summary(modelo01_w)
 ```
 
 Para o modelo 2, que não considera 'fun' e 'attr', temos: 
 ``` {r} 
-modelo02_m = lm(like ~ sinc + intel + amb + shar +  prob + age_diff, dataMen)  
-modelo02_w = lm(like ~ sinc + intel + amb + shar +  prob + age_diff, dataWomen)
+modelo02_m = lm(like ~ sinc + intel + amb + shar +  prob, dataMen)  
+modelo02_w = lm(like ~ sinc + intel + amb + shar +  prob, dataWomen)
 summary(modelo02_m)
 summary(modelo02_w)
 ```
 
 Para o modelo 3, que não considera 'sinc' e 'shar' temos: 
 ``` {r} 
-modelo03_m = lm(like ~ attr + intel + fun + amb +  prob + age_diff, dataMen)  
-modelo03_w = lm(like ~ attr + intel + fun + amb +  prob + age_diff, dataWomen)
+modelo03_m = lm(like ~ attr + intel + fun + amb +  prob, dataMen)  
+modelo03_w = lm(like ~ attr + intel + fun + amb +  prob, dataWomen)
 summary(modelo03_m)
 summary(modelo03_w)
 ```
@@ -165,7 +171,7 @@ summary(modelo03_w)
 
 #### Significância:
   
-  Nas métricas dos modelos análisados temos códigos de significância para indicar variáveis que podem estar relacionadas com a variável resposta que procuramos ou não.
+  Nas métricas dos modelos análisados, temos códigos de significância para indicar quão boa é a estimativa do modelo para o coeficiente em questão. Uma baixa significância para uma determinada variável pode indicar que ela não é tão boa em explicar a variável dependente. 
     
 ##### Modelo 1
 Para o modelo dos homens vemos que a diferença de idade entre as pessoas no encontro não parece ser significante para o modelo. 
@@ -181,12 +187,18 @@ Já para as mulheres a ambição e diferença de idade são variáveis que não 
 Para o modelo dos homens vemos que a diferença de idade ganha um pouco de significância, porém a ambição (amb) percebida tem Pr(>|t|) muito alta pra ser considerado significante.
 Já para as mulheres a ambição e diferença de idade continuam sem estar ligadas ao "like".
 
-    
-    
-    
-    
-### Relevância e Magnitude dos Coeficientes:     
-Neste caso os coeficientes estão variando de 0 a 1, dando uma característica de peso a uma certa característica. Ou seja, quanto maior o coeficiente relacionado a uma certa característica, maior a influência que aquele atributo terá naquele modelo. 
+
+### Relevância e Magnitude dos Coeficientes:   
+
+Nosso modelo de regressão busca explicar uma variável _(like)_ que varia entre 0 e 10, com outras variáveis que variam entre 0 e 10. 
+
+Portanto, montando um modelo da forma:
+$like = C1*ATTR + C2*SHAR + ... + C$
+
+Para que a variável like varie entre 0 e 10, sabendo que as outras variáveis também variam entre 0 e 10. 
+Espera-se que os *coeficientes* variem entre 0 e 1. 
+
+O modelo de regressão linear estimará esse coeficiente dentro de um intervalo de confiança e caso esse intervalo seja muito grande, isso indica que aquela variável provavelmente não explica a variação da variável like. 
 
 ##### Modelo 1
   Os fatores mais importantes são 'attr'(aparência) e 'fun'(Quão divertida a outra pessoa parecia) e 'attr e shar'(interesses compartilhados), para homens e mulheres respectivamente.
