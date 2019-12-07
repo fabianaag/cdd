@@ -62,8 +62,8 @@ Após o tratamento dos dados restaram um total de **4024** respostas do question
 
 Os dados¹ foram coletados em um experimento² pelos professores da ***Columbia Business School***, que disponibilizaram os dados para a comunidade. 
 
-- ¹ Dados - https://github.com/nazareno/ciencia-de-dados-1/tree/master/5-regressao/speed-dating
-- ² Experimento - https://faculty.chicagobooth.edu/emir.kamenica/documents/genderDifferences.pdf 
+* ¹ Dados - https://github.com/nazareno/ciencia-de-dados-1/tree/master/5-regressao/speed-dating
+* ² Experimento - https://faculty.chicagobooth.edu/emir.kamenica/documents/genderDifferences.pdf 
 
 ---
 
@@ -74,9 +74,9 @@ Utilizaremos de Modelos de Regressão linear para tentar obter informações que
 Em modelos de regressão múltipla é necessário determinar um subconjunto de variáveis independentes que melhor expliquem a variável resposta, isto é, dentre todas as variáveis explicativas disponíveis, devemos encontrar um subconjunto de variáveis importantes para o modelo. 
 
 No total iremos criar os seguintes modelos: 
-  - Um mais abrangente, contendo várias variáveis independentes. 
-  - Uma variação do modelo abrangente removendo *Interesses compartilhados(shar)* e *Sinceridade(sinc)*.
-  - Uma variação do modelo abrangente removendo 2 variáveis com maior correlação com a variável dependente.
+* Um mais abrangente, contendo várias variáveis independentes. 
+* Uma variação do modelo abrangente removendo *Interesses compartilhados(shar)* e *Sinceridade(sinc)*.
+* Uma variação do modelo abrangente removendo 2 variáveis com maior correlação com a variável dependente.
 
 Para visualizar a distribuição e correlação, utilizamos as cores ciano e magenta sobrepostas, os picos que apresentarem a cor ciano indicam mais votos de homens naquela faixa, e picos com a cor magenta indicam predominância de votos de mulheres naquela faixa. 
 
@@ -169,85 +169,122 @@ summary(modelo03_w)
 
 ---
 
-#### Significância:
+### **Significância, Relevância e Magnitude dos Coeficientes**
+##### **Significância**  
+  Nosso modelo de regressão busca explicar uma variável _(like)_ que varia entre 0 e 10, com outras variáveis que variam entre 0 e 10. 
+
+  Portanto, montando um modelo da forma:
+$like = C_0 + C_1*ATTR + C_2*SHAR + ... + C_n * ATTR_n$
+
+  O nosso modelo tentará estimar os coeficientes $C_0, C_1, C_2, ...,C_N$ de modo a otimizar a precisão do mesmo. 
+
+  A estimativa para o valor dos coeficientes, tem um **intervalo de confiança** e um **valor-p** associados para cada um dos coeficientes, por convenção em um teste de hipotese caso esse valor-p seja **<= 5%** podemos rejeitar a hipotese nula, ou seja, caso o valor-p seja **<= 5%** podemos assumir que aquela variável e coeficiente estimados ajudam a explicar a variável dependente. 
+
+##### **Magnitude**
+  Quanto a magnitude dos coeficientes, esperamos ver para o nosso modelo em específico, valores para os coeficientes entre 0 e 1. 
   
-  Nas métricas dos modelos análisados, temos códigos de significância para indicar quão boa é a estimativa do modelo para o coeficiente em questão. Uma baixa significância para uma determinada variável pode indicar que ela não é tão boa em explicar a variável dependente. 
+  Pois, mesmo que os valores para os coeficientes possam assumir quaisquer valores, no nosso caso como a variável Dependente e Independentes variam dentro do mesmo intervalo [0, 10]. Nossa intuição é que nosso modelo de regressão se assemelhe a uma média ponderada, onde o coeficiente seria o peso daquela característica. 
+  
+##### **Relevância** 
+  Podemos considerar características relevantes aquelas que estão acima da média para montar nossa estimativa. Ou seja, um coeficiente $C$ é relevante se $C \ge 1 \div N$ onde $N$ é igual ao número de variáveis independentes, desta forma variáveis relevantes irão contribuir com maior força para a variável like.
     
-##### Modelo 1
-Para o modelo dos homens vemos que a diferença de idade entre as pessoas no encontro não parece ser significante para o modelo. 
-Já para as mulheres além da diferença de idade, a ambição que a mulher julgava compartilhar com a pessoa que ela se encontrou não parece ser relevante para o like.
+##### **Modelo 1**
+Todas as caracteristicas são significatívas, exceto AMB no caso das mulheres. 
 
+* Características menos relevantes: 
+  * Para homens: [AMB, SINC, INTEL]
+  * Para mulheres: [AMB, SINC, PROB]
     
-##### Modelo 2 (sem fun e attr)
-Para o modelo dos homens vemos que a diferença de idade continua sem ser significante para o modelo porém a ambição (amb) percebida perde um pouco a significância.
-Já para as mulheres a ambição e diferença de idade são variáveis que não parecem estar ligadas ao "like".
+##### **Modelo 2 (sem fun e attr)**
+Todas as caracteristicas são significatívas, exceto AMB para homens e mulheres. 
 
+* Características menos relevantes: 
+  * Para homens: [AMB, INTEL]
+  * Para mulheres: [AMB, PROB]
   
-##### Modelo 3 (sem sinc e shar)
-Para o modelo dos homens vemos que a diferença de idade ganha um pouco de significância, porém a ambição (amb) percebida tem Pr(>|t|) muito alta pra ser considerado significante.
-Já para as mulheres a ambição e diferença de idade continuam sem estar ligadas ao "like".
-
-
-### Relevância e Magnitude dos Coeficientes:   
-
-Nosso modelo de regressão busca explicar uma variável _(like)_ que varia entre 0 e 10, com outras variáveis que variam entre 0 e 10. 
-
-Portanto, montando um modelo da forma:
-$like = C1*ATTR + C2*SHAR + ... + C$
-
-Para que a variável like varie entre 0 e 10, sabendo que as outras variáveis também variam entre 0 e 10. 
-Espera-se que os *coeficientes* variem entre 0 e 1. 
-
-O modelo de regressão linear estimará esse coeficiente dentro de um intervalo de confiança e caso esse intervalo seja muito grande, isso indica que aquela variável provavelmente não explica a variação da variável like. 
-
-##### Modelo 1
-  Os fatores mais importantes são 'attr'(aparência) e 'fun'(Quão divertida a outra pessoa parecia) e 'attr e shar'(interesses compartilhados), para homens e mulheres respectivamente.
-
-##### Modelo 2 
-  Os fatores mais importantes para esse modelo são 'shar e prob'(Probabilidade de querer se ver de novo) e 'shar e intel'(inteligência percebida) para homens e mulheres respectivamente.  
+##### **Modelo 3 (sem sinc e shar)**
+Todas as caracteristicas são significatívas, exceto AMB para homens e mulheres. 
   
-##### Modelo 3
-  Os fatores mais importantes para esse modelo são 'attr e fun' e 'attr e fun'(Quão divertido o ouro é) para homens e mulheres respectivamente.
-
+* Características menos relevantes: 
+  * Para homens: [AMB, INTEL]
+  * Para mulheres: [AMB, PROB]
 
 
 ### R Squared e R Squared Adjusted:
 
-R Squared indica uma medida de quão bem o modelo se ajusta aos dados. É uma medida que varia de 0 a 1, onde 0 representa um modelo que não se adequa aos dados e valores próximos a 1, indicam modelos que se ajustam bem aos dados.  
+  R Squared indica uma medida de quão bem o modelo se ajusta aos dados. 
+  É uma medida que varia de 0 a 1, onde 0 representa um modelo que não se adequa aos dados e valores próximos a 1 indicam modelos que se ajustam bem aos dados. 
+  
+  Um número maior de variáveis pode aumentar o R² de um modelo O Adjusted R² tenta compensar pelo número de variáveis.
   
 ##### Modelo 1
-  Os valores de R² pra esse modelo são os mais altos de todos os modelos, geralmente um número mais de variáveis pode aumentar o R² de um modelo.
+  Modelo mais abrangente.
+  
+* Homens:
+  + $R² = 0.6431$
+  + $adj. R² = 0.6419$
+  
+* Mulheres:
+  + $R² = 0.7028$
+  + $adj. R² = 0.7017$
 
 ##### Modelo 2 
-  O menor valor de R² de todos os modelos, o que indica que a percepção de quão atrativa e legal a outra pessoa é, é bastante importante para a variável que queremos estimar.
+  Ao remover 'attr' e 'fun'.
+  
+* Homens:
+  + $R² = 0.5041$
+  + $adj. R² = 0.5028$
+  
+* Mulheres:
+  + $R² = 0.5852$
+  + $adj. R² = 0.5842$
   
 ##### Modelo 3 
-  Ao remover 'sinc' e  'shar', também temos uma degradação do modelo porém temos um modelo que explica melhor a variável independente do que o modelo 2. 
-
+  Ao remover 'sinc' e  'shar'. 
+  
+* Homens:
+  + $R² = 0.6165$
+  + $adjusted R² = 0.6155$
+  
+* Mulheres:
+  + $R² = 0.6652$
+  + $adjusted R² = 0.6644$
+  
   
 ### Resíduos
-  Nas métricas de qualidade acima *Residual Standard Error* é a medida de ajuste do modelo de regressão. Teóricamente, todo modelo de regressão linear tem um erro associado ***E***. Devido a presença desse erro não somos capazes de predizer perfeitamente a variável *like* apartir das outras variáveis, sendo assim o *Residual Standard Error* (erro padrão residual) é o uma média da diferença entre as estimativas versus os dados reais observados. Ou seja, ao estimar, é provável que exista uma diferença entre a estimativa e o valor do like real com a magnitude do erro residual padrão.
+  Nas métricas de qualidade acima *Residual Standard Error* é a medida de ajuste do modelo de regressão. Teoricamente, todo modelo de regressão linear tem um erro associado ***E***. Devido a presença desse erro não somos capazes de predizer perfeitamente a variável *like* apartir das outras variáveis, sendo assim o *Residual Standard Error* (erro padrão residual) é o uma média da diferença entre as estimativas versus os dados reais observados. Ou seja, ao estimar, é provável que exista uma diferença entre a estimativa e o valor do like real com a magnitude do erro residual padrão.
   
 ##### Modelo 1
-  O erro residual padrão é 1.05. Lembrando que segundo as métricas esse até agora é o nosso melhor modelo. 
+* O erro residual padrão é:
+  + 1.049 para os homens.
+  + 1.059 para as mulheres. 
+  
+Lembrando que segundo as métricas esse até agora é o nosso melhor modelo. 
 
 ##### Modelo 2 
-  O erro residual padrão é 1.236 e 1.25. Com menos variáveis e um R² menor do que o modelo 1,  o erro residual padrão aumenta como era de se esperar.
+* O erro residual padrão é:
+  + 1.236 para os homens.
+  + 1.25 para as mulheres. 
+
+Com menos variáveis e um R² menor do que o modelo 1, o erro residual padrão aumenta como era de se esperar.
   
 ##### Modelo 3
-  O erro residual padrão é 1.086 e 1.123. Como vimos além do R² desse modelo ser melhor, ou seja um pouco maior do que o R² do modelo 2, o erro residual padrão também é menor. 
+* O erro residual padrão é:
+  + 1.087 para os homens.
+  + 1.123. para as mulheres. 
+  
+Além do R² desse modelo ser melhor do que o R² do modelo 2, o erro residual padrão também é menor. 
 
 ## Conclusões 
-Neste relatório utilizamos de modelos lineares para tentar explicar características que possam  influenciar um indivíduo gostar de outro em um encontro relâmpago, ou speed dating. Partimos de modelos mais simples, para modelos mais complexos analisando o quão bem o modelo em questão explica a variável independente. 
+  Neste relatório utilizamos de modelos lineares para tentar explicar características que possam  influenciar um indivíduo gostar de outro em um encontro relâmpago, ou speed dating. 
+  
+  Partimos de modelos mais simples, para modelos mais complexos analisando o quão bem o modelo em questão explica a variável independente. 
 
-Neste processo identificamos que algumas variáveis como a diferença de idade entre os individuos, não parecem influenciar na qualidade do modelo ou até ter impactos negativos, introzindo ruído e diminuíndo a eficácia do modelo. 
+  Neste processo identificamos que algumas variáveis acabam sendo associadas a coeficientes proporcionais a sua importância em estimar a nossa variável dependente. 
 
-Além disso, verificamos que as duas variáveis independentes influênciam mais no modelo para mulheres, ou seja, as mulheres se importam mais com o interesse em comum e a sinceridade do que os homens, de acordo com esse experimento. Por fim, percebemos também que a variável que representa o interesse em comum tem mais influência que a sinceridade.
+  Também veríficamos ao comparar os modelos que um modelo que leva em consideração ATTR e FUN estima LIKE com melhores métricas, do que um modelo que utilize SINC e SHAR. 
+  Porém ao utilizar essas variáveis em conjunto, conseguimos um modelo com métricas ainda melhores.
+  
+  Por fim, percebemos também que a variável que representa o interesse em comum tem mais influência que a sinceridade.
 
-Um modelo de regressão ideal, explicaria toda a variância e teria portanto uma métrica próxima a 1. 
-Porém existem fatores aleatórios que não foram considerados pelo modelo que poderiam afetar a qualidade do mesmo, por exemplo, as cidades de origem dos indivíduos e por consequência a distância entre os indivíduos, se são da mesma etnia, etc. 
-
-De tal forma que parece improvável que um modelo de regressão linear seja capaz de acertar com perfeição o like baseado nas respostas dos questionários após os encontros de 4 minutos. 
-
-
----
+  Um modelo de regressão ideal, explicaria toda a variância e teria portanto uma métrica R² próxima a 1. Porém, vale salientar que existem fatores aleatórios que não foram considerados pelo modelo que afetam a qualidade do mesmo, por exemplo, as cidades de origem dos indivíduos e por consequência a distância entre os indivíduos, preferências políticas, se são da mesma etnia, etc. 
