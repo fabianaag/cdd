@@ -60,7 +60,7 @@ Como os dados que temos em mãos, iremos orientar essa análise por duas pergunt
 --- 
 
 Para responder as perguntas precisamos manipular os dados. 
-Ou seja, precisamos encontrar nos dados os filmes que se encaixam nas restrições das perguntas que queremos responder, filtrando pelos gêneros e titulos específicos da franquia ***Senhor dos Anéis*** E ***Harry Potter***.
+Ou seja, precisamos encontrar nos dados os filmes que se encaixam nas restrições das perguntas que queremos responder, filtrando pelos gêneros e titulos específicos das franquias ***Senhor dos Anéis*** E ***Harry Potter***.
 
 ---
 ```{r}
@@ -208,12 +208,12 @@ Ao analisar os dados de avaliação desses filmes é difícil fazer afirmações
 
 Aplicando um intervalo de confiança, com um nível de confiança relativamente alto nesses dados que apresentam uma distribuição normal ficamos um pouco mais confortáveis em fazer afirmações sobre a média de uma amostra da população. 
 
-Se considerarmos que a população real, ou seja as opiniões dos espectadores dos filmes aqui listados, está em concordância com a amostra que analizamos então outras amostras da população real teriam resultados próximos aos encontrados. 
+De toda forma, como os valores dentro do intervalo [0, 5] são incrementados em 0.5 unidades, diferenças menores do que isso podem não ser tão significantes. Por exemplo, 2 filmes com médias 3.8 e 3.93 respectivamente, teriam por exemplo a maioria das notas concentradas entre 3.5 e 4. 
 
 Na nossa análise pode-se dizer que nossas respostas indicam que:
 
 1. **Dentre os gêneros de *Ação*, *Romance* e *Comédia*; Algum deles recebe avaliação mais alta?**
-  - Sim, média observada nas avaliações dos espectadores é varia, mostrando avaliações mais altas para os filmes de Romance, Ação e Comédia respectivamente. De toda forma, como a os valores da escala são incrementados em 0.5, a diferença nas médias é pouco significante. 
-2. ***Senhor dos Anéis* vs *Harry Potter*, algum dos dois é melhor avaliado?** 
-  - Sim, para um intervalo de confiança de 95% a avaliação média dos filmes de **O Senhor dos Anéis** (3.98 ~ 4.13), costuma ser mais alta do que a avaliação média de **Harry Potter** (3.75 ~ 3.88). Porém a diferença máxima entre os intervalos é de 3.75 - 4.13 = 0.38, o que ainda é menor do que a unidade mínima na escala de avaliações. Não parecendo ser muito significante.
+  + Sim, a média observada nas avaliações dos espectadores apresenta diferenças, mostrando avaliações mais altas para os filmes de Romance, Ação e Comédia respectivamente. De toda forma, como a os valores da escala são incrementados em 0.5, a diferença nas médias é pouco significante. 
+2. **Senhor dos Anéis* vs *Harry Potter*, algum dos dois é melhor avaliado?** 
+  + Sim, para um intervalo de confiança de 95% a avaliação média dos filmes de **O Senhor dos Anéis** (3.98 ~ 4.13), costuma ser mais alta do que a avaliação média de **Harry Potter** (3.75 ~ 3.88). Porém a diferença máxima entre os intervalos é de 3.75 - 4.13 = 0.38, o que ainda é menor do que a unidade mínima na escala de avaliações. Não parecendo ser muito significante.
   
