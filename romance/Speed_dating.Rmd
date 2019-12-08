@@ -54,7 +54,8 @@ dataMen = speed_dating_attributes %>%
 Este relatório tem como objetivo elucidar uma pergunta utilizando os dados de encontros relâmpagos, também conhecido como speed dating.  
 
 Logo, a pergunta que tentaremos elucidar é:
-- O quanto a sinceridade observada no parceiro e os interesses em comum influenciam o like?
+
+* O quanto a sinceridade observada no parceiro e os interesses em comum influenciam o like?
 
 Após encontros que duravam 4 minutos os participantes respondiam a um questionário dizendo o que acharam sobre a pessoa com quem tiveram o encontro, no total foram respondidos por volta de 5 mil questionários sobre os encontros.  
 
@@ -73,7 +74,8 @@ Utilizaremos de Modelos de Regressão linear para tentar obter informações que
 
 Em modelos de regressão múltipla é necessário determinar um subconjunto de variáveis independentes que melhor expliquem a variável resposta, isto é, dentre todas as variáveis explicativas disponíveis, devemos encontrar um subconjunto de variáveis importantes para o modelo. 
 
-No total iremos criar os seguintes modelos: 
+No total iremos criar os seguintes modelos:
+
 * Um mais abrangente, contendo várias variáveis independentes. 
 * Uma variação do modelo abrangente removendo *Interesses compartilhados(shar)* e *Sinceridade(sinc)*.
 * Uma variação do modelo abrangente removendo 2 variáveis com maior correlação com a variável dependente.
@@ -179,6 +181,8 @@ $like = C_0 + C_1*ATTR + C_2*SHAR + ... + C_n * ATTR_n$
   O nosso modelo tentará estimar os coeficientes $C_0, C_1, C_2, ...,C_N$ de modo a otimizar a precisão do mesmo. 
 
   A estimativa para o valor dos coeficientes, tem um **intervalo de confiança** e um **valor-p** associados para cada um dos coeficientes, por convenção em um teste de hipotese caso esse valor-p seja **<= 5%** podemos rejeitar a hipotese nula, ou seja, caso o valor-p seja **<= 5%** podemos assumir que aquela variável e coeficiente estimados ajudam a explicar a variável dependente. 
+  
+  A significância relacionada aos coeficientes das variáveis independentes podem ser vistas na tabela pelos valores da coluna `Pr(>|t|)` ou através dos simbolos à direita da coluna. 
 
 ##### **Magnitude**
   Quanto a magnitude dos coeficientes, esperamos ver para o nosso modelo em específico, valores para os coeficientes entre 0 e 1. 
@@ -186,38 +190,46 @@ $like = C_0 + C_1*ATTR + C_2*SHAR + ... + C_n * ATTR_n$
   Pois, mesmo que os valores para os coeficientes possam assumir quaisquer valores, no nosso caso como a variável Dependente e Independentes variam dentro do mesmo intervalo [0, 10]. Nossa intuição é que nosso modelo de regressão se assemelhe a uma média ponderada, onde o coeficiente seria o peso daquela característica. 
   
 ##### **Relevância** 
-  Podemos considerar características relevantes aquelas que estão acima da média para montar nossa estimativa. Ou seja, um coeficiente $C$ é relevante se $C \ge 1 \div N$ onde $N$ é igual ao número de variáveis independentes, desta forma variáveis relevantes irão contribuir com maior força para a variável like.
+  Os coeficientes de regressão descrevem o relacionamento entre cada variável preditora e a resposta. O valor do coeficiente representa a mudança média na resposta, dado o aumento de uma unidade no preditor. Consequentemente, é fácil achar que variáveis com coeficientes maiores são mais importantes porque representam uma mudança maior na resposta.
+
+  No entanto, as *unidades variam* entre os diferentes tipos de variáveis, o que inviabiliza sua comparação direta. Por exemplo, o significado da alteração de uma unidade é muito diferente se você estiver falando sobre temperatura, peso ou concentração de substâncias químicas.
+  
+  Também é importante salientar que o termo relevância não carrega nenhum valor moral ou ético sobre as variáveis, apenas indica o quanto elas contribuem para o valor da variável dependente.
+
+  No nosso caso, as unidades e escalas de todas as variáveis são as mesmas. Por isso nossa intuição de que a somatória dos coeficientes das variáveis independentes se aproximaria de 1 parece se fazer presente. 
+  
+  Dada essa característica dos nossos dados, iremos dizer que as variáveis relevantes são aquelas que estão acima da média para montar nossa estimativa. Ou seja, um coeficiente $C$ é relevante se $C \ge 1 \div N$ onde $N$ é igual ao número de variáveis independentes, desta forma variáveis relevantes irão contribuir com maior força para a variável like.
     
 ##### **Modelo 1**
 Todas as caracteristicas são significatívas, exceto AMB no caso das mulheres. 
 
 * Características menos relevantes: 
-  * Para homens: [AMB, SINC, INTEL]
-  * Para mulheres: [AMB, SINC, PROB]
+  * Para homens: [**AMB, SINC, INTEL**]
+  * Para mulheres: [**AMB, SINC, PROB**]
     
 ##### **Modelo 2 (sem fun e attr)**
 Todas as caracteristicas são significatívas, exceto AMB para homens e mulheres. 
 
 * Características menos relevantes: 
-  * Para homens: [AMB, INTEL]
-  * Para mulheres: [AMB, PROB]
+  * Para homens: [**AMB, INTEL**]
+  * Para mulheres: [**AMB, PROB**]
   
 ##### **Modelo 3 (sem sinc e shar)**
 Todas as caracteristicas são significatívas, exceto AMB para homens e mulheres. 
   
 * Características menos relevantes: 
-  * Para homens: [AMB, INTEL]
-  * Para mulheres: [AMB, PROB]
+  * Para homens: [**AMB, INTEL**]
+  * Para mulheres: [**AMB, PROB**]
 
 
-### R Squared e R Squared Adjusted:
+### **R Squared e R Squared Adjusted**:
 
   R Squared indica uma medida de quão bem o modelo se ajusta aos dados. 
   É uma medida que varia de 0 a 1, onde 0 representa um modelo que não se adequa aos dados e valores próximos a 1 indicam modelos que se ajustam bem aos dados. 
   
   Um número maior de variáveis pode aumentar o R² de um modelo O Adjusted R² tenta compensar pelo número de variáveis.
   
-##### Modelo 1
+##### **Modelo 1**
   Modelo mais abrangente.
   
 * Homens:
@@ -228,7 +240,7 @@ Todas as caracteristicas são significatívas, exceto AMB para homens e mulheres
   + $R² = 0.7028$
   + $adj. R² = 0.7017$
 
-##### Modelo 2 
+##### **Modelo 2**
   Ao remover 'attr' e 'fun'.
   
 * Homens:
@@ -239,7 +251,7 @@ Todas as caracteristicas são significatívas, exceto AMB para homens e mulheres
   + $R² = 0.5852$
   + $adj. R² = 0.5842$
   
-##### Modelo 3 
+##### **Modelo 3**
   Ao remover 'sinc' e  'shar'. 
   
 * Homens:
@@ -251,31 +263,31 @@ Todas as caracteristicas são significatívas, exceto AMB para homens e mulheres
   + $adjusted R² = 0.6644$
   
   
-### Resíduos
+### **Resíduos**
   Nas métricas de qualidade acima *Residual Standard Error* é a medida de ajuste do modelo de regressão. Teoricamente, todo modelo de regressão linear tem um erro associado ***E***. Devido a presença desse erro não somos capazes de predizer perfeitamente a variável *like* apartir das outras variáveis, sendo assim o *Residual Standard Error* (erro padrão residual) é o uma média da diferença entre as estimativas versus os dados reais observados. Ou seja, ao estimar, é provável que exista uma diferença entre a estimativa e o valor do like real com a magnitude do erro residual padrão.
   
-##### Modelo 1
+##### **Modelo 1**
 * O erro residual padrão é:
   + 1.049 para os homens.
   + 1.059 para as mulheres. 
   
 Lembrando que segundo as métricas esse até agora é o nosso melhor modelo. 
 
-##### Modelo 2 
+##### **Modelo 2** 
 * O erro residual padrão é:
   + 1.236 para os homens.
   + 1.25 para as mulheres. 
 
 Com menos variáveis e um R² menor do que o modelo 1, o erro residual padrão aumenta como era de se esperar.
   
-##### Modelo 3
+##### **Modelo 3**
 * O erro residual padrão é:
   + 1.087 para os homens.
   + 1.123. para as mulheres. 
   
 Além do R² desse modelo ser melhor do que o R² do modelo 2, o erro residual padrão também é menor. 
 
-## Conclusões 
+## **Conclusões**
   Neste relatório utilizamos de modelos lineares para tentar explicar características que possam  influenciar um indivíduo gostar de outro em um encontro relâmpago, ou speed dating. 
   
   Partimos de modelos mais simples, para modelos mais complexos analisando o quão bem o modelo em questão explica a variável independente. 

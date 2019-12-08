@@ -52,10 +52,10 @@ Os dados fornecidos[¹](https://grouplens.org/datasets/movielens/), podem ser at
   ratings = read.csv('./dados/ratings.csv')
 ```
 
-Como os dados que temos em mãos, iremos orientar essa análise por duas perguntas. 
+Utilizando os dados, iremos orientar essa análise por duas perguntas. 
 
   1. **Dentre os gêneros de *Ação*, *Romance* e *Comédia*; Algum deles recebe avaliação mais alta?**
-  2. ***Senhor dos Anéis* vs *Harry Potter*, algum dos dois é melhor avaliado?** 
+  2. **Senhor dos Anéis* vs *Harry Potter*, algum dos dois é melhor avaliado?** 
 
 --- 
 
